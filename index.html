@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Hey it works</h1>
+
+    <form method="POST" onsubmit="addContact(event)" class="contact-form">
+        <input type="text" name="person" placeholder="Name">
+        <input type="text" name="mobile" placeholder="Mobile">
+        <button type="submit">Save</button>
+    </form>
+
+    <ul class="contact-list"></ul>
+
+
+    <script>
+        let contacts = [];
+
+        getContacts();
+
+        function getContacts() {
+            fetch('/contacts.php')
+                .then(res => res.json())
+                .then(json => {
+                    contacts = json;
+                    renderContacts()
+                });
+        }
+
+        function addContact(event) {
+            event.preventDefault();
+
+            let url = 'http://form-request.test/add-contact.php';
+
+            let formData = new FormData(document.querySelector('.contact-form'));
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            }).then(res => {
+                document.querySelector('.contact-form').reset();
+                getContacts();
+            }).catch(err => {
+                alert("Something went wrong!")
+            })
+        }
+
+        function renderContacts() {
+            let list = document.querySelector('.contact-list');
+            list.innerHTML = "";
+
+            contacts.forEach((contact) => {
+                let person = document.createElement('li');
+                person.innerHTML = `${contact.name} (${contact.mobile})`;
+
+                list.appendChild(person);
+            })
+        }
+    </script>
+</body>
+
+</html>
